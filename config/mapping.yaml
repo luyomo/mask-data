@@ -1,0 +1,16 @@
+config:
+  index_method: column
+  mask_rules:
+    column_name_01:
+      mask_type: md5
+    column_name_02:
+      mask_type: fix_data
+      value: "xxxxxxxxxx"
+    column_name_03:
+      mask_type: map
+      mapping:
+        "test column 31": "test masked column data 31"
+        "test column 34": "test masked column data 34"
+    column_name_04:
+      mask_type: map
+      mapping_file: config/column_mapping.yaml

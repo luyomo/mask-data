@@ -1,0 +1,88 @@
+* CSV Data Masking Application
+This is a Go application to mask CSV data based on specific masking rules. It supports masking using MD5 hashing, fixed data values, and data mapping (both from internal config and external mapping files).
+
+** Features
+The application processes CSV files and applies various masking rules to certain columns. The masking rules are defined in a YAML configuration file and can be applied in the following ways:
+
+1. ~fix_data~: Sets a fixed value to a column.
+2. ~md5~: Replaces the column value with its MD5 hash.
+3. ~mapping~ with internal config: Maps source values to target values for low cardinality data.
+4. ~mapping~ with external mapping file: Maps source values to target values using an external file for high cardinality data.
+
+** Example
+The following original CSV data:
+
+#+BEGIN_SRC
+column_name_01,column_name_02,column_name_03,column_name_04,column_name05
+test column 01,test column 11,test column 31,test column 41,test column 51
+test column 02,test column 12,test column 32,test column 42,test column 52
+test column 03,test column 13,test column 33,test column 43,test column 53
+test column 01,test column 14,test column 34,test column 44,test column 54
+test column 02,test column 15,test column 35,test column 45,test column 55
+#+END_SRC
+
+Will be masked to the following output data:
+
+#+BEGIN_SRC
+column_name_01,column_name_02,column_name_03,column_name_04,column_name05
+219a05e3c24b3ccec4240d3710ad9a62,xxxxxxxxxx,test masked column data 31,test masked column data 41,test column 51
+593a5976a62d421fa456042a0d704062,xxxxxxxxxx,Default,Default,test column 52
+39f5546af039b94d8a2086dfb5d7e64b,xxxxxxxxxx,Default,Default,test column 53
+219a05e3c24b3ccec4240d3710ad9a62,xxxxxxxxxx,test masked column data 34,test masked column data 44,test column 54
+593a5976a62d421fa456042a0d704062,xxxxxxxxxx,Default,Default,test column 55
+#+END_SRC
+
+** Configuration
+
+The masking rules are defined in a YAML configuration file. Below is an example ~config.yaml~:
+
+#+BEGIN_SRC yaml
+config:
+  index_method: column
+  mask_rules:
+    column_name_01:
+      mask_type: md5
+    column_name_02:
+      mask_type: fix_data
+      value: "xxxxxxxxxx"
+    column_name_03:
+      mask_type: map
+      mapping:
+        "test column 31": "test masked column data 31"
+        "test column 34": "test masked column data 34"
+    column_name_04:
+      mask_type: map
+      mapping_file: config/column_mapping.yaml
+#+END_SRC
+
+In the configuration:
+
+- ~column_name_01~ is masked with the MD5 hash.
+- ~column_name_02~ is replaced with the fixed value ~xxxxxxxxxx~.
+- ~column_name_03~ uses internal mapping from the config file.
+- ~column_name_04~ uses external mapping defined in a file, e.g., ~config/column_mapping.yaml~.
+
+** Mapping File
+An external mapping file is used for high cardinality data. Below is an example of the ~column_mapping.yaml~:
+
+#+BEGIN_SRC yaml
+"test column 41": "test masked column data 41"
+"test column 44": "test masked column data 44"
+#+END_SRC
+
+** Usage
+
+The application accepts the following command-line arguments:
+
+- ~--config~: Path to the YAML configuration file.
+- ~--data~: Path to the CSV file to be masked.
+- ~--output~: Directory where the masked CSV output will be saved.
+
+** Example Execution
+
+Run the application with the following command:
+
+#+BEGIN_SRC bash
+./go_app --config config/mapping.yaml --data data/test.csv --output output/
+#+END_SRC
+
