@@ -9,11 +9,15 @@ import (
 )
 
 type MaskRule struct {
-    MaskType     string         `yaml:"mask_type"`
-    // Mapping      []Mapping `yaml:"mapping,omitempty"`       // Optional mapping array
+    MaskType     string            `yaml:"mask_type"`
+
     Mapping      map[string]string `yaml:"mapping,omitempty"`       // Optional mapping array
-    MappingFile  string         `yaml:"mapping_file,omitempty"`   // Optional mapping file
-    Value        string         `yaml:"value,omitempty"`
+    MappingFile  string            `yaml:"mapping_file,omitempty"`   // Optional mapping file
+    Value        string            `yaml:"value,omitempty"`
+
+    // Used for regexp
+    MatchStr     string            `yaml:"match_str,omitempty"`
+    ReplaceWith  string            `yaml:"replace_with,omitempty"`
 }
 
 type Config struct {

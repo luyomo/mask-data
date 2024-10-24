@@ -1,6 +1,6 @@
-column_name_01,column_name_02,column_name_03,column_name_04,column_name05
-219a05e3c24b3ccec4240d3710ad9a62,xxxxxxxxxx,test masked column data 31,test masked column data 41,test column 51
-593a5976a62d421fa456042a0d704062,xxxxxxxxxx,Default,Default,test column 52
-39f5546af039b94d8a2086dfb5d7e64b,xxxxxxxxxx,Default,Default,test column 53
-219a05e3c24b3ccec4240d3710ad9a62,xxxxxxxxxx,test masked column data 34,test masked column data 44,test column 54
-593a5976a62d421fa456042a0d704062,xxxxxxxxxx,Default,Default,test column 55
+column_name_01,column_name_02,column_name_03,column_name_04,column_name_05,column_name_06
+219a05e3c24b3ccec4240d3710ad9a62,xxxxxxxxxx,test masked column data 31,test masked column data 41,test column 51,This is the first number ###-####-### from test
+593a5976a62d421fa456042a0d704062,xxxxxxxxxx,Default,Default,test column 52,This is the second number ###-####-### from test
+39f5546af039b94d8a2086dfb5d7e64b,xxxxxxxxxx,Default,Default,test column 53,This is the third number ###-####-### from test
+219a05e3c24b3ccec4240d3710ad9a62,xxxxxxxxxx,test masked column data 34,test masked column data 44,test column 54,This is the forth number ###-####-### from test
+593a5976a62d421fa456042a0d704062,xxxxxxxxxx,Default,Default,test column 55,This is the fifth number ###-####-### from test

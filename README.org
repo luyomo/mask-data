@@ -1,5 +1,5 @@
 * CSV Data Masking Application
-This is a Go application to mask CSV data based on specific masking rules. It supports masking using MD5 hashing, fixed data values, and data mapping (both from internal config and external mapping files).
+This is a Go application to mask CSV data based on specific masking rules. It supports masking using MD5 hashing, fixed data values, data mapping (both from internal config and external mapping files) and flexible regular expression-based masking.
 
 ** Features
 The application processes CSV files and applies various masking rules to certain columns. The masking rules are defined in a YAML configuration file and can be applied in the following ways:
@@ -8,28 +8,29 @@ The application processes CSV files and applies various masking rules to certain
 2. ~md5~: Replaces the column value with its MD5 hash.
 3. ~mapping~ with internal config: Maps source values to target values for low cardinality data.
 4. ~mapping~ with external mapping file: Maps source values to target values using an external file for high cardinality data.
+5. ~regexp~: Replaces parts of a column value that match a regular expression with a defined string.
 
 ** Example
 The following original CSV data:
 
 #+BEGIN_SRC
-column_name_01,column_name_02,column_name_03,column_name_04,column_name05
-test column 01,test column 11,test column 31,test column 41,test column 51
-test column 02,test column 12,test column 32,test column 42,test column 52
-test column 03,test column 13,test column 33,test column 43,test column 53
-test column 01,test column 14,test column 34,test column 44,test column 54
-test column 02,test column 15,test column 35,test column 45,test column 55
+column_name_01,column_name_02,column_name_03,column_name_04,column_name_05,column_name_06
+test column 01,test column 11,test column 31,test column 41,test column 51,This is the first number 123-4567-890 from test
+test column 02,test column 12,test column 32,test column 42,test column 52,This is the second number 234-5678-901 from test
+test column 03,test column 13,test column 33,test column 43,test column 53,This is the third number 345-6789-012 from test
+test column 01,test column 14,test column 34,test column 44,test column 54,This is the forth number 456-7890-123 from test
+test column 02,test column 15,test column 35,test column 45,test column 55,This is the fifth number 567-8901-234 from test
 #+END_SRC
 
 Will be masked to the following output data:
 
 #+BEGIN_SRC
-column_name_01,column_name_02,column_name_03,column_name_04,column_name05
-219a05e3c24b3ccec4240d3710ad9a62,xxxxxxxxxx,test masked column data 31,test masked column data 41,test column 51
-593a5976a62d421fa456042a0d704062,xxxxxxxxxx,Default,Default,test column 52
-39f5546af039b94d8a2086dfb5d7e64b,xxxxxxxxxx,Default,Default,test column 53
-219a05e3c24b3ccec4240d3710ad9a62,xxxxxxxxxx,test masked column data 34,test masked column data 44,test column 54
-593a5976a62d421fa456042a0d704062,xxxxxxxxxx,Default,Default,test column 55
+column_name_01,column_name_02,column_name_03,column_name_04,column_name_05,column_name_06
+219a05e3c24b3ccec4240d3710ad9a62,xxxxxxxxxx,test masked column data 31,test masked column data 41,test column 51,This is the first number ###-####-### from test
+593a5976a62d421fa456042a0d704062,xxxxxxxxxx,Default,Default,test column 52,This is the second number ###-####-### from test
+39f5546af039b94d8a2086dfb5d7e64b,xxxxxxxxxx,Default,Default,test column 53,This is the third number ###-####-### from test
+219a05e3c24b3ccec4240d3710ad9a62,xxxxxxxxxx,test masked column data 34,test masked column data 44,test column 54,This is the forth number ###-####-### from test
+593a5976a62d421fa456042a0d704062,xxxxxxxxxx,Default,Default,test column 55,This is the fifth number ###-####-### from test
 #+END_SRC
 
 ** Configuration
@@ -53,6 +54,10 @@ config:
     column_name_04:
       mask_type: map
       mapping_file: config/column_mapping.yaml
+    column_name_06:
+      mask_type: regexp
+      match_str: "[0-9]"
+      replace_with: "#"
 #+END_SRC
 
 In the configuration:
@@ -61,6 +66,8 @@ In the configuration:
 - ~column_name_02~ is replaced with the fixed value ~xxxxxxxxxx~.
 - ~column_name_03~ uses internal mapping from the config file.
 - ~column_name_04~ uses external mapping defined in a file, e.g., ~config/column_mapping.yaml~.
+- ~column_name_06~ uses a regular expression to mask numbers with the ~#~ character.
+
 
 ** Mapping File
 An external mapping file is used for high cardinality data. Below is an example of the ~column_mapping.yaml~:
@@ -83,6 +90,6 @@ The application accepts the following command-line arguments:
 Run the application with the following command:
 
 #+BEGIN_SRC bash
-./go_app --config config/mapping.yaml --data data/test.csv --output output/
+./mask_data --config config/mapping.yaml --data data/test.csv --output output/
 #+END_SRC
 

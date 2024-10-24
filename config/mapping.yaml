@@ -1,5 +1,8 @@
 config:
   index_method: column
+  csv:
+    delimiter: ";"
+    quote: "\""
   mask_rules:
     column_name_01:
       mask_type: md5
@@ -14,3 +17,7 @@ config:
     column_name_04:
       mask_type: map
       mapping_file: config/column_mapping.yaml
+    column_name_06:
+      mask_type: regexp
+      match_str: "[0-9]"
+      replace_with: "#"

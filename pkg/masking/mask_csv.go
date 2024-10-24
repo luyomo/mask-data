@@ -8,6 +8,7 @@ import (
     "crypto/md5"
     "encoding/hex"
     "path/filepath"
+    "regexp"
 )
 
 var mapColumnFunc = map[string]func(string)string{}
@@ -21,9 +22,11 @@ func MaskCSVData(opts *utils.CommandOptions) error {
 	if mapFile.MaskType == "fix_data" {
 	    mapColumnFunc[colName] = returnFuncFixValue(mapFile.Value)
         }
+
 	if mapFile.MaskType == "md5" {
 	    mapColumnFunc[colName] = returnFuncMD5()
         }
+
 	if mapFile.MaskType == "map" {
 	    if mapFile.Mapping != nil {
 	        mapColumnFunc[colName] = returnFuncMapConfig(mapFile.Mapping)
@@ -34,6 +37,9 @@ func MaskCSVData(opts *utils.CommandOptions) error {
 		}
 	        mapColumnFunc[colName] = returnFuncMapConfig(valueMap)
 	    }
+        }
+	if mapFile.MaskType == "regexp" {
+	    mapColumnFunc[colName] = returnFuncRegexp(mapFile.MatchStr, mapFile.ReplaceWith)
         }
     }
 
@@ -122,6 +128,14 @@ func MaskCSVData(opts *utils.CommandOptions) error {
     }
 
     return nil
+}
+
+func returnFuncRegexp(matchStr, replaceWith string) func(string)string {
+    re := regexp.MustCompile(matchStr)
+
+    return func(theV string) string {
+        return re.ReplaceAllString(theV, replaceWith)
+    }
 }
 
 func returnFuncMapConfig(mapV map[string]string) func(string)string {
